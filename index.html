@@ -33,10 +33,22 @@ body{
 }
 
 /* LOCK */
-.lock-wrapper{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}
-.lock{max-width:520px;width:100%;background:var(--card);padding:32px;border-radius:18px;box-shadow:0 6px 20px rgba(0,0,0,.08);text-align:center}
-.lock input{width:100%;padding:14px;border-radius:12px;border:1px solid #ccc;font-size:16px;margin-bottom:16px}
-.lock button{width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);font-weight:600}
+.lock-wrapper{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px
+}
+.lock{
+  max-width:520px;width:100%;background:var(--card);
+  padding:32px;border-radius:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,.08);text-align:center
+}
+.lock input{
+  width:100%;padding:14px;border-radius:12px;
+  border:1px solid #ccc;font-size:16px;margin-bottom:16px
+}
+.lock button{
+  width:100%;padding:14px;border-radius:12px;
+  border:none;background:var(--accent);font-weight:600
+}
 
 /* EDITOR */
 .editor{display:none;max-width:1400px;margin:0 auto;padding:32px}
@@ -48,49 +60,23 @@ body{
 h2{margin:0 0 12px}
 
 label{
-  display:block;
-  max-width:540px;
-  margin:18px auto 6px;
-  font-size:14px;
-  font-weight:600;
-  color:#444;
+  display:block;max-width:540px;margin:18px auto 6px;
+  font-size:14px;font-weight:600;color:#444
 }
 input,textarea{
-  width:100%;
-  max-width:540px;
-  margin:0 auto;
-  display:block;
-  padding:12px 14px;
-  border-radius:12px;
-  border:1px solid #ccc;
-  font-size:15px;
+  width:100%;max-width:540px;margin:0 auto;display:block;
+  padding:12px 14px;border-radius:12px;
+  border:1px solid #ccc;font-size:15px
 }
 textarea{min-height:70px;resize:vertical}
 input[type=file]{padding:10px}
 
 .actions{grid-column:1/-1}
 .actions button{
-  width:100%;
-  padding:16px;
-  border-radius:14px;
-  border:none;
-  font-size:16px;
-  font-weight:600;
-  margin-top:12px;
-  cursor:pointer;
+  width:100%;padding:16px;border-radius:14px;border:none;
+  font-size:16px;font-weight:600;margin-top:12px;cursor:pointer
 }
 .download{background:#4caf50;color:#fff}
-
-pre{
-  background:#111;
-  color:#0f0;
-  padding:16px;
-  border-radius:12px;
-  font-size:13px;
-  max-height:360px;
-  overflow:auto;
-  display:none;
-}
 </style>
 </head>
 
@@ -100,7 +86,8 @@ pre{
 <div class="lock-wrapper" id="lockWrapper">
   <div class="lock">
     <h2>🔐 PET-ID Editor</h2>
-    <input id="pin" placeholder="PIN" onkeydown="if(event.key==='Enter'){unlock()}">
+    <input id="pin" placeholder="PIN"
+      onkeydown="if(event.key==='Enter'){unlock()}">
     <button type="button" onclick="unlock()">Entsperren</button>
   </div>
 </div>
@@ -178,11 +165,8 @@ pre{
 <!-- EXPORT -->
 <div class="card actions"><div class="card-inner">
 <h2>Export</h2>
-<button class="download" onclick="showJSON()">👁️ pet.json anzeigen</button>
-<button class="download" onclick="downloadJSON()">⬇️ pet.json herunterladen</button>
 <button class="download" onclick="downloadHTML()">⬇️ index.html herunterladen</button>
 <button class="download" onclick="downloadImage()">⬇️ Bild herunterladen</button>
-<pre id="jsonPreview"></pre>
 </div></div>
 
 </div>
@@ -200,72 +184,17 @@ function unlock(){
 }
 image.onchange=e=>imageFile=e.target.files[0];
 
-const v = id => document.getElementById(id).value.trim();
+const v=id=>document.getElementById(id).value.trim();
 
-function buildPetJSON(){
-  return {
-    meta:{
-      name:v("name"),
-      pet_id:v("pet_id"),
-      subtitle:v("subtitle"),
-      image:imageFile?imageFile.name:"",
-      last_updated:new Date().toISOString().slice(0,10)
-    },
-    animal:{
-      species:v("species"),
-      gender:v("gender"),
-      birthdate:v("birthdate"),
-      color:v("color"),
-      breed:v("breed"),
-      castrated:v("castrated"),
-      outdoor:v("outdoor"),
-      chipped:v("chipped"),
-      vaccinated:v("vaccinated"),
-      microchip:v("microchip"),
-      note:v("note")
-    },
-    owner1:{name:v("o1_name"),phone:v("o1_phone"),email:v("o1_email")},
-    owner2:{name:v("o2_name"),phone:v("o2_phone"),email:v("o2_email")},
-    vet:{
-      practice:v("vet_practice"),
-      doctor:v("vet_doctor"),
-      phone:v("vet_phone"),
-      email:v("vet_email"),
-      website:v("vet_website")
-    },
-    emergency:{
-      clinic:v("em_clinic"),
-      address:v("em_address"),
-      phone:v("em_phone"),
-      note:v("em_note")
-    },
-    home:{address:v("home")}
-  };
-}
-
-function showJSON(){
-  jsonPreview.textContent=JSON.stringify(buildPetJSON(),null,2);
-  jsonPreview.style.display="block";
-}
-
-function downloadJSON(){
-  const blob=new Blob([JSON.stringify(buildPetJSON(),null,2)],{type:"application/json"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob); a.download="pet.json"; a.click();
-}
-
-/* 🐾 TIERSEITE */
 function downloadHTML(){
-  const p=buildPetJSON();
-  const safe = v => v ? v : null;
-  const row=(l,v)=>safe(v)?`<div class="row"><span>${l}</span><strong>${v}</strong></div>`:"";
+  const safe=v=>v?`<div class="row"><span>${v[0]}</span><strong>${v[1]}</strong></div>`:"";
 
   const html=`<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${p.meta.name || "PET-ID"}</title>
+<title>${v("name")||"PET-ID"}</title>
 <style>
 body{margin:0;font-family:system-ui;background:#f6f6f6;color:#2b2b2b}
 .container{max-width:520px;margin:20px auto;padding:16px}
@@ -282,25 +211,24 @@ box-shadow:0 4px 14px rgba(0,0,0,.06)}
 <div class="container">
 
 <div class="card header">
-${p.meta.image?`<img src="${p.meta.image}">`:""}
-<h1>${p.meta.name || "Unbekanntes Tier"}</h1>
-<div>PET-ID: ${p.meta.pet_id || "—"}</div>
-${safe(p.meta.subtitle)?`<div>${p.meta.subtitle}</div>`:""}
+${imageFile?`<img src="${imageFile.name}">`:""}
+<h1>${v("name")||"Unbekanntes Tier"}</h1>
+<div>PET-ID: ${v("pet_id")||"—"}</div>
+${v("subtitle")?`<div>${v("subtitle")}</div>`:""}
 </div>
 
 <div class="card">
-<h3>Tierdaten</h3>
-${row("Tierart",p.animal.species)}
-${row("Geschlecht",p.animal.gender)}
-${row("Geburtsdatum",p.animal.birthdate)}
-${row("Farbe",p.animal.color)}
-${row("Rasse",p.animal.breed)}
-${row("Kastriert",p.animal.castrated)}
-${row("Freigänger",p.animal.outdoor)}
-${row("Gechippt",p.animal.chipped)}
-${row("Geimpft",p.animal.vaccinated)}
-${row("Mikrochip",p.animal.microchip)}
-${row("Hinweis",p.animal.note)}
+${safe(["Tierart",v("species")])}
+${safe(["Geschlecht",v("gender")])}
+${safe(["Geburtsdatum",v("birthdate")])}
+${safe(["Farbe",v("color")])}
+${safe(["Rasse",v("breed")])}
+${safe(["Kastriert",v("castrated")])}
+${safe(["Freigänger",v("outdoor")])}
+${safe(["Gechippt",v("chipped")])}
+${safe(["Geimpft",v("vaccinated")])}
+${safe(["Mikrochip",v("microchip")])}
+${safe(["Hinweis",v("note")])}
 </div>
 
 <div class="footer">
@@ -314,13 +242,13 @@ ${row("Hinweis",p.animal.note)}
 
   const blob=new Blob([html],{type:"text/html"});
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob); a.download="index.html"; a.click();
+  a.href=URL.createObjectURL(blob);a.download="index.html";a.click();
 }
 
 function downloadImage(){
   if(!imageFile)return alert("Kein Bild ausgewählt");
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(imageFile); a.download=imageFile.name; a.click();
+  a.href=URL.createObjectURL(imageFile);a.download=imageFile.name;a.click();
 }
 </script>
 
