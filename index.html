@@ -22,65 +22,31 @@
   --text:#2b2b2b;--muted:#777;
 }
 *{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;
-  background:var(--bg);color:var(--text)
-}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:var(--text)}
 
-/* LOCK */
-.lock-wrapper{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px
-}
-.lock{
-  max-width:520px;width:100%;background:var(--card);
-  padding:32px;border-radius:18px;
-  box-shadow:0 6px 20px rgba(0,0,0,.08);text-align:center
-}
-.lock input{
-  width:100%;max-width:480px;margin:0 auto 16px;
-  padding:14px;border-radius:12px;border:1px solid #ccc;font-size:16px
-}
-.lock button{
-  width:100%;padding:14px;border-radius:12px;border:none;
-  background:var(--accent);font-weight:600
-}
+.lock-wrapper{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}
+.lock{max-width:520px;width:100%;background:var(--card);padding:32px;border-radius:18px;box-shadow:0 6px 20px rgba(0,0,0,.08);text-align:center}
+.lock input{width:100%;max-width:480px;margin:0 auto 16px;padding:14px;border-radius:12px;border:1px solid #ccc;font-size:16px}
+.lock button{width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);font-weight:600}
 
-/* EDITOR */
 .editor{display:none;max-width:1400px;margin:0 auto;padding:32px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
 
-.card{
-  background:var(--card);border-radius:18px;
-  box-shadow:0 4px 14px rgba(0,0,0,.06)
-}
+.card{background:var(--card);border-radius:18px;box-shadow:0 4px 14px rgba(0,0,0,.06)}
 .card-inner{padding:28px 32px}
 h2{margin:0 0 12px}
 
-label{
-  display:block;max-width:540px;margin:18px auto 6px;
-  font-size:14px;font-weight:600;color:#444;text-align:left
-}
-input,textarea{
-  width:100%;max-width:540px;margin:0 auto;display:block;
-  padding:12px 14px;border-radius:12px;
-  border:1px solid #ccc;font-size:15px
-}
+label{display:block;max-width:540px;margin:18px auto 6px;font-size:14px;font-weight:600;color:#444}
+input,textarea{width:100%;max-width:540px;margin:0 auto;display:block;padding:12px 14px;border-radius:12px;border:1px solid #ccc;font-size:15px}
 textarea{min-height:70px;resize:vertical}
 input[type=file]{padding:10px}
 
 .actions{grid-column:1/-1}
-.actions button{
-  width:100%;padding:16px;border-radius:14px;border:none;
-  font-size:16px;font-weight:600;margin-top:12px;cursor:pointer
-}
+.actions button{width:100%;padding:16px;border-radius:14px;border:none;font-size:16px;font-weight:600;margin-top:12px;cursor:pointer}
 .download{background:#4caf50;color:#fff}
 
-pre{
-  background:#111;color:#0f0;padding:16px;border-radius:12px;
-  font-size:13px;max-height:320px;overflow:auto;display:none
-}
+pre{background:#111;color:#0f0;padding:16px;border-radius:12px;font-size:13px;max-height:360px;overflow:auto;display:none}
 </style>
 </head>
 
@@ -116,7 +82,53 @@ pre{
 <label>Geburtsdatum</label><input id="birthdate">
 <label>Farbe</label><input id="color">
 <label>Rasse</label><input id="breed">
+<label>Kastriert</label><input id="castrated">
+<label>Freigänger</label><input id="outdoor">
+<label>Gechippt</label><input id="chipped">
+<label>Geimpft</label><input id="vaccinated">
+<label>Mikrochip</label><input id="microchip">
 <label>Hinweis</label><textarea id="note"></textarea>
+</div></div>
+
+<!-- BESITZER 1 -->
+<div class="card"><div class="card-inner">
+<h2>Besitzer 1</h2>
+<label>Name</label><input id="o1_name">
+<label>Telefon</label><input id="o1_phone">
+<label>E-Mail</label><input id="o1_email">
+</div></div>
+
+<!-- BESITZER 2 -->
+<div class="card"><div class="card-inner">
+<h2>Besitzer 2</h2>
+<label>Name</label><input id="o2_name">
+<label>Telefon</label><input id="o2_phone">
+<label>E-Mail</label><input id="o2_email">
+</div></div>
+
+<!-- TIERARZT -->
+<div class="card"><div class="card-inner">
+<h2>Tierarzt</h2>
+<label>Praxis</label><input id="vet_practice">
+<label>Tierärztin / Arzt</label><input id="vet_doctor">
+<label>Telefon</label><input id="vet_phone">
+<label>E-Mail</label><input id="vet_email">
+<label>Website</label><input id="vet_website">
+</div></div>
+
+<!-- NOTFALL -->
+<div class="card"><div class="card-inner">
+<h2>Notfall</h2>
+<label>Klinik</label><input id="em_clinic">
+<label>Adresse</label><textarea id="em_address"></textarea>
+<label>Telefon</label><input id="em_phone">
+<label>Hinweis</label><input id="em_note">
+</div></div>
+
+<!-- ZUHAUSE -->
+<div class="card"><div class="card-inner">
+<h2>Zuhause</h2>
+<label>Adresse</label><textarea id="home"></textarea>
 </div></div>
 
 <!-- EXPORT -->
@@ -148,20 +160,41 @@ image.onchange=e=>imageFile=e.target.files[0];
 function buildPetJSON(){
   return {
     meta:{
-      name:name.value.trim(),
-      pet_id:pet_id.value.trim(),
-      subtitle:subtitle.value.trim(),
+      name:name.value||"",
+      pet_id:pet_id.value||"",
+      subtitle:subtitle.value||"",
       image:imageFile?imageFile.name:"",
       last_updated:new Date().toISOString().slice(0,10)
     },
     animal:{
-      species:species.value,
-      gender:gender.value,
-      birthdate:birthdate.value,
-      color:color.value,
-      breed:breed.value,
-      note:note.value
-    }
+      species:species.value||"",
+      gender:gender.value||"",
+      birthdate:birthdate.value||"",
+      color:color.value||"",
+      breed:breed.value||"",
+      castrated:castrated.value||"",
+      outdoor:outdoor.value||"",
+      chipped:chipped.value||"",
+      vaccinated:vaccinated.value||"",
+      microchip:microchip.value||"",
+      note:note.value||""
+    },
+    owner1:{name:o1_name.value||"",phone:o1_phone.value||"",email:o1_email.value||""},
+    owner2:{name:o2_name.value||"",phone:o2_phone.value||"",email:o2_email.value||""},
+    vet:{
+      practice:vet_practice.value||"",
+      doctor:vet_doctor.value||"",
+      phone:vet_phone.value||"",
+      email:vet_email.value||"",
+      website:vet_website.value||""
+    },
+    emergency:{
+      clinic:em_clinic.value||"",
+      address:em_address.value||"",
+      phone:em_phone.value||"",
+      note:em_note.value||""
+    },
+    home:{address:home.value||""}
   };
 }
 
@@ -178,19 +211,12 @@ function downloadJSON(){
   a.click();
 }
 
-/* 🐾 TIERSEITE – ROBUST */
 function downloadHTML(){
   const p=buildPetJSON();
-
-  const petName=p.meta.name||"Unbekanntes Tier";
-  const petId=p.meta.pet_id||"—";
-  const subtitle=p.meta.subtitle||"";
-
   const row=(l,v)=>v?`<div class="row"><div class="label">${l}</div><div class="value">${v}</div></div>`:"";
-
   const html=`<!DOCTYPE html><html lang="de"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${petName} – PET-ID</title>
+<title>${p.meta.name||"PET-ID"} – PET-ID</title>
 <style>
 body{margin:0;font-family:system-ui;background:#f6f6f6;color:#2b2b2b}
 .container{max-width:520px;margin:20px auto;padding:16px}
@@ -203,10 +229,10 @@ body{margin:0;font-family:system-ui;background:#f6f6f6;color:#2b2b2b}
 .label{color:#777}.value{font-weight:500;text-align:right}
 </style></head><body><div class="container">
 <div class="card header">
-${p.meta.image?`<img src="${p.meta.image}" alt="${petName}">`:""}
-<h1>${petName}</h1>
-<div class="petid">PET-ID: ${petId}</div>
-${subtitle?`<div class="subtitle">${subtitle}</div>`:""}
+${p.meta.image?`<img src="${p.meta.image}" alt="${p.meta.name}">`:""}
+<h1>${p.meta.name||""}</h1>
+<div class="petid">PET-ID: ${p.meta.pet_id||""}</div>
+${p.meta.subtitle?`<div class="subtitle">${p.meta.subtitle}</div>`:""}
 </div>
 <div class="card">
 ${row("Tierart",p.animal.species)}
@@ -217,7 +243,6 @@ ${row("Rasse",p.animal.breed)}
 ${row("Hinweis",p.animal.note)}
 </div>
 </div></body></html>`;
-
   const blob=new Blob([html],{type:"text/html"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
