@@ -211,44 +211,113 @@ function downloadJSON(){
   a.click();
 }
 
+<script>
 function downloadHTML(){
-  const p=buildPetJSON();
-  const row=(l,v)=>v?`<div class="row"><div class="label">${l}</div><div class="value">${v}</div></div>`:"";
-  const html=`<!DOCTYPE html><html lang="de"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${p.meta.name||"PET-ID"} – PET-ID</title>
+  const p = buildPetJSON();
+
+  const safe = v => v && v.trim() !== "" ? v : null;
+  const row  = (l,v)=> safe(v)
+    ? `<div class="row"><div class="label">${l}</div><div class="value">${v}</div></div>`
+    : "";
+
+  const html = `<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${p.meta.name || "PET-ID"} – PET-ID</title>
 <style>
 body{margin:0;font-family:system-ui;background:#f6f6f6;color:#2b2b2b}
 .container{max-width:520px;margin:20px auto;padding:16px}
-.card{background:#fff;border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.card{background:#fff;border-radius:14px;padding:20px;margin-bottom:16px;
+      box-shadow:0 4px 14px rgba(0,0,0,.06)}
 .header{text-align:center}
-.header img{width:200px;height:200px;border-radius:50%;object-fit:cover;border:4px solid #d8b48a}
+.header img{width:200px;height:200px;border-radius:50%;object-fit:cover;
+            border:4px solid #d8b48a}
 .petid{font-family:monospace;color:#d8b48a;margin-top:6px}
 .subtitle{color:#777;margin-top:6px}
 .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee}
-.label{color:#777}.value{font-weight:500;text-align:right}
-</style></head><body><div class="container">
+.label{color:#777}
+.value{font-weight:500;text-align:right}
+h2{margin-top:0}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<!-- HEADER -->
 <div class="card header">
-${p.meta.image?`<img src="${p.meta.image}" alt="${p.meta.name}">`:""}
-<h1>${p.meta.name||""}</h1>
-<div class="petid">PET-ID: ${p.meta.pet_id||""}</div>
-${p.meta.subtitle?`<div class="subtitle">${p.meta.subtitle}</div>`:""}
+${p.meta.image ? `<img src="${p.meta.image}" alt="${p.meta.name}">` : ""}
+<h1>${p.meta.name || "Unbekanntes Tier"}</h1>
+<div class="petid">PET-ID: ${p.meta.pet_id || "—"}</div>
+${safe(p.meta.subtitle) ? `<div class="subtitle">${p.meta.subtitle}</div>` : ""}
 </div>
+
+<!-- TIER -->
 <div class="card">
-${row("Tierart",p.animal.species)}
-${row("Geschlecht",p.animal.gender)}
-${row("Geburtsdatum",p.animal.birthdate)}
-${row("Farbe",p.animal.color)}
-${row("Rasse",p.animal.breed)}
-${row("Hinweis",p.animal.note)}
+<h2>Tierdaten</h2>
+${row("Tierart", p.animal.species)}
+${row("Geschlecht", p.animal.gender)}
+${row("Geburtsdatum", p.animal.birthdate)}
+${row("Farbe", p.animal.color)}
+${row("Rasse", p.animal.breed)}
+${row("Kastriert", p.animal.castrated)}
+${row("Freigänger", p.animal.outdoor)}
+${row("Gechippt", p.animal.chipped)}
+${row("Geimpft", p.animal.vaccinated)}
+${row("Mikrochip", p.animal.microchip)}
+${row("Hinweis", p.animal.note)}
 </div>
-</div></body></html>`;
-  const blob=new Blob([html],{type:"text/html"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="index.html";
+
+<!-- BESITZER -->
+<div class="card">
+<h2>Besitzer</h2>
+${row("Name", p.owner1?.name)}
+${row("Telefon", p.owner1?.phone)}
+${row("E-Mail", p.owner1?.email)}
+${row("Name (2)", p.owner2?.name)}
+${row("Telefon (2)", p.owner2?.phone)}
+${row("E-Mail (2)", p.owner2?.email)}
+</div>
+
+<!-- TIERARZT -->
+<div class="card">
+<h2>Tierarzt</h2>
+${row("Praxis", p.vet?.practice)}
+${row("Tierärztin / Arzt", p.vet?.doctor)}
+${row("Telefon", p.vet?.phone)}
+${row("E-Mail", p.vet?.email)}
+${row("Website", p.vet?.website)}
+</div>
+
+<!-- NOTFALL -->
+<div class="card">
+<h2>Notfall</h2>
+${row("Klinik", p.emergency?.clinic)}
+${row("Adresse", p.emergency?.address)}
+${row("Telefon", p.emergency?.phone)}
+${row("Hinweis", p.emergency?.note)}
+</div>
+
+<!-- ZUHAUSE -->
+<div class="card">
+<h2>Zuhause</h2>
+${row("Adresse", p.home?.address)}
+</div>
+
+</div>
+</body>
+</html>`;
+
+  const blob = new Blob([html], {type:"text/html"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "index.html";
   a.click();
 }
+</script>
+
 
 function downloadImage(){
   if(!imageFile)return alert("Kein Bild ausgewählt");
