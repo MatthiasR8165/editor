@@ -11,24 +11,30 @@
 
 <meta name="theme-color" content="#d8b48a">
 
-<link rel="icon" href="/assets/icons/favicon.ico?v=editor">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png?v=editor">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16.png?v=editor">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=editor">
+<link rel="icon" href="/assets/icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
 
 <style>
 :root{
-  --bg:#f6f6f6;--card:#fff;--accent:#d8b48a;
-  --text:#2b2b2b;--muted:#777;
+  --bg:#f6f6f6; --card:#fff; --accent:#d8b48a;
+  --text:#2b2b2b; --muted:#777;
 }
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:var(--text)}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  background:var(--bg); color:var(--text);
+}
 
+/* LOCK */
 .lock-wrapper{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}
 .lock{max-width:520px;width:100%;background:var(--card);padding:32px;border-radius:18px;box-shadow:0 6px 20px rgba(0,0,0,.08);text-align:center}
-.lock input{width:100%;max-width:480px;margin:0 auto 16px;padding:14px;border-radius:12px;border:1px solid #ccc;font-size:16px}
+.lock input{width:100%;padding:14px;border-radius:12px;border:1px solid #ccc;font-size:16px;margin-bottom:16px}
 .lock button{width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);font-weight:600}
 
+/* EDITOR */
 .editor{display:none;max-width:1400px;margin:0 auto;padding:32px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
@@ -37,16 +43,50 @@ body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;backgr
 .card-inner{padding:28px 32px}
 h2{margin:0 0 12px}
 
-label{display:block;max-width:540px;margin:18px auto 6px;font-size:14px;font-weight:600;color:#444}
-input,textarea{width:100%;max-width:540px;margin:0 auto;display:block;padding:12px 14px;border-radius:12px;border:1px solid #ccc;font-size:15px}
+label{
+  display:block;
+  max-width:540px;
+  margin:18px auto 6px;
+  font-size:14px;
+  font-weight:600;
+  color:#444;
+}
+input,textarea{
+  width:100%;
+  max-width:540px;
+  margin:0 auto;
+  display:block;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  font-size:15px;
+}
 textarea{min-height:70px;resize:vertical}
 input[type=file]{padding:10px}
 
 .actions{grid-column:1/-1}
-.actions button{width:100%;padding:16px;border-radius:14px;border:none;font-size:16px;font-weight:600;margin-top:12px;cursor:pointer}
+.actions button{
+  width:100%;
+  padding:16px;
+  border-radius:14px;
+  border:none;
+  font-size:16px;
+  font-weight:600;
+  margin-top:12px;
+  cursor:pointer;
+}
 .download{background:#4caf50;color:#fff}
 
-pre{background:#111;color:#0f0;padding:16px;border-radius:12px;font-size:13px;max-height:360px;overflow:auto;display:none}
+pre{
+  background:#111;
+  color:#0f0;
+  padding:16px;
+  border-radius:12px;
+  font-size:13px;
+  max-height:360px;
+  overflow:auto;
+  display:none;
+}
 </style>
 </head>
 
@@ -76,7 +116,7 @@ pre{background:#111;color:#0f0;padding:16px;border-radius:12px;font-size:13px;ma
 
 <!-- TIER -->
 <div class="card"><div class="card-inner">
-<h2>Tierdaten</h2>
+<h2>Tier</h2>
 <label>Tierart</label><input id="species">
 <label>Geschlecht</label><input id="gender">
 <label>Geburtsdatum</label><input id="birthdate">
@@ -110,7 +150,7 @@ pre{background:#111;color:#0f0;padding:16px;border-radius:12px;font-size:13px;ma
 <div class="card"><div class="card-inner">
 <h2>Tierarzt</h2>
 <label>Praxis</label><input id="vet_practice">
-<label>Tierärztin / Arzt</label><input id="vet_doctor">
+<label>Arzt</label><input id="vet_doctor">
 <label>Telefon</label><input id="vet_phone">
 <label>E-Mail</label><input id="vet_email">
 <label>Website</label><input id="vet_website">
@@ -154,47 +194,48 @@ function unlock(){
     editor.style.display="block";
   } else alert("Falscher PIN");
 }
-
 image.onchange=e=>imageFile=e.target.files[0];
+
+const v = id => document.getElementById(id).value.trim();
 
 function buildPetJSON(){
   return {
     meta:{
-      name:name.value||"",
-      pet_id:pet_id.value||"",
-      subtitle:subtitle.value||"",
+      name:v("name"),
+      pet_id:v("pet_id"),
+      subtitle:v("subtitle"),
       image:imageFile?imageFile.name:"",
       last_updated:new Date().toISOString().slice(0,10)
     },
     animal:{
-      species:species.value||"",
-      gender:gender.value||"",
-      birthdate:birthdate.value||"",
-      color:color.value||"",
-      breed:breed.value||"",
-      castrated:castrated.value||"",
-      outdoor:outdoor.value||"",
-      chipped:chipped.value||"",
-      vaccinated:vaccinated.value||"",
-      microchip:microchip.value||"",
-      note:note.value||""
+      species:v("species"),
+      gender:v("gender"),
+      birthdate:v("birthdate"),
+      color:v("color"),
+      breed:v("breed"),
+      castrated:v("castrated"),
+      outdoor:v("outdoor"),
+      chipped:v("chipped"),
+      vaccinated:v("vaccinated"),
+      microchip:v("microchip"),
+      note:v("note")
     },
-    owner1:{name:o1_name.value||"",phone:o1_phone.value||"",email:o1_email.value||""},
-    owner2:{name:o2_name.value||"",phone:o2_phone.value||"",email:o2_email.value||""},
+    owner1:{name:v("o1_name"),phone:v("o1_phone"),email:v("o1_email")},
+    owner2:{name:v("o2_name"),phone:v("o2_phone"),email:v("o2_email")},
     vet:{
-      practice:vet_practice.value||"",
-      doctor:vet_doctor.value||"",
-      phone:vet_phone.value||"",
-      email:vet_email.value||"",
-      website:vet_website.value||""
+      practice:v("vet_practice"),
+      doctor:v("vet_doctor"),
+      phone:v("vet_phone"),
+      email:v("vet_email"),
+      website:v("vet_website")
     },
     emergency:{
-      clinic:em_clinic.value||"",
-      address:em_address.value||"",
-      phone:em_phone.value||"",
-      note:em_note.value||""
+      clinic:v("em_clinic"),
+      address:v("em_address"),
+      phone:v("em_phone"),
+      note:v("em_note")
     },
-    home:{address:home.value||""}
+    home:{address:v("home")}
   };
 }
 
@@ -206,125 +247,76 @@ function showJSON(){
 function downloadJSON(){
   const blob=new Blob([JSON.stringify(buildPetJSON(),null,2)],{type:"application/json"});
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="pet.json";
-  a.click();
+  a.href=URL.createObjectURL(blob); a.download="pet.json"; a.click();
 }
 
-<script>
+/* 🐾 TIERSEITE */
 function downloadHTML(){
-  const p = buildPetJSON();
+  const p=buildPetJSON();
+  const safe = v => v ? v : null;
+  const row=(l,v)=>safe(v)?`<div class="row"><span>${l}</span><strong>${v}</strong></div>`:"";
 
-  const safe = v => v && v.trim() !== "" ? v : null;
-  const row  = (l,v)=> safe(v)
-    ? `<div class="row"><div class="label">${l}</div><div class="value">${v}</div></div>`
-    : "";
-
-  const html = `<!DOCTYPE html>
+  const html=`<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${p.meta.name || "PET-ID"} – PET-ID</title>
+<title>${p.meta.name || "PET-ID"}</title>
 <style>
 body{margin:0;font-family:system-ui;background:#f6f6f6;color:#2b2b2b}
 .container{max-width:520px;margin:20px auto;padding:16px}
 .card{background:#fff;border-radius:14px;padding:20px;margin-bottom:16px;
-      box-shadow:0 4px 14px rgba(0,0,0,.06)}
+box-shadow:0 4px 14px rgba(0,0,0,.06)}
 .header{text-align:center}
-.header img{width:200px;height:200px;border-radius:50%;object-fit:cover;
-            border:4px solid #d8b48a}
-.petid{font-family:monospace;color:#d8b48a;margin-top:6px}
-.subtitle{color:#777;margin-top:6px}
+.header img{width:200px;height:200px;border-radius:50%;object-fit:cover;border:4px solid #d8b48a}
 .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee}
-.label{color:#777}
-.value{font-weight:500;text-align:right}
-h2{margin-top:0}
+.footer{text-align:center;font-size:13px;color:#777;margin-top:24px}
+.footer a{color:#777;text-decoration:none;margin:0 6px}
 </style>
 </head>
-
 <body>
 <div class="container">
 
-<!-- HEADER -->
 <div class="card header">
-${p.meta.image ? `<img src="${p.meta.image}" alt="${p.meta.name}">` : ""}
+${p.meta.image?`<img src="${p.meta.image}">`:""}
 <h1>${p.meta.name || "Unbekanntes Tier"}</h1>
-<div class="petid">PET-ID: ${p.meta.pet_id || "—"}</div>
-${safe(p.meta.subtitle) ? `<div class="subtitle">${p.meta.subtitle}</div>` : ""}
+<div>PET-ID: ${p.meta.pet_id || "—"}</div>
+${safe(p.meta.subtitle)?`<div>${p.meta.subtitle}</div>`:""}
 </div>
 
-<!-- TIER -->
 <div class="card">
-<h2>Tierdaten</h2>
-${row("Tierart", p.animal.species)}
-${row("Geschlecht", p.animal.gender)}
-${row("Geburtsdatum", p.animal.birthdate)}
-${row("Farbe", p.animal.color)}
-${row("Rasse", p.animal.breed)}
-${row("Kastriert", p.animal.castrated)}
-${row("Freigänger", p.animal.outdoor)}
-${row("Gechippt", p.animal.chipped)}
-${row("Geimpft", p.animal.vaccinated)}
-${row("Mikrochip", p.animal.microchip)}
-${row("Hinweis", p.animal.note)}
+<h3>Tierdaten</h3>
+${row("Tierart",p.animal.species)}
+${row("Geschlecht",p.animal.gender)}
+${row("Geburtsdatum",p.animal.birthdate)}
+${row("Farbe",p.animal.color)}
+${row("Rasse",p.animal.breed)}
+${row("Kastriert",p.animal.castrated)}
+${row("Freigänger",p.animal.outdoor)}
+${row("Gechippt",p.animal.chipped)}
+${row("Geimpft",p.animal.vaccinated)}
+${row("Mikrochip",p.animal.microchip)}
+${row("Hinweis",p.animal.note)}
 </div>
 
-<!-- BESITZER -->
-<div class="card">
-<h2>Besitzer</h2>
-${row("Name", p.owner1?.name)}
-${row("Telefon", p.owner1?.phone)}
-${row("E-Mail", p.owner1?.email)}
-${row("Name (2)", p.owner2?.name)}
-${row("Telefon (2)", p.owner2?.phone)}
-${row("E-Mail (2)", p.owner2?.email)}
-</div>
-
-<!-- TIERARZT -->
-<div class="card">
-<h2>Tierarzt</h2>
-${row("Praxis", p.vet?.practice)}
-${row("Tierärztin / Arzt", p.vet?.doctor)}
-${row("Telefon", p.vet?.phone)}
-${row("E-Mail", p.vet?.email)}
-${row("Website", p.vet?.website)}
-</div>
-
-<!-- NOTFALL -->
-<div class="card">
-<h2>Notfall</h2>
-${row("Klinik", p.emergency?.clinic)}
-${row("Adresse", p.emergency?.address)}
-${row("Telefon", p.emergency?.phone)}
-${row("Hinweis", p.emergency?.note)}
-</div>
-
-<!-- ZUHAUSE -->
-<div class="card">
-<h2>Zuhause</h2>
-${row("Adresse", p.home?.address)}
+<div class="footer">
+<a href="/impressum.html">Impressum</a> ·
+<a href="/datenschutz.html">Datenschutz</a>
 </div>
 
 </div>
 </body>
 </html>`;
 
-  const blob = new Blob([html], {type:"text/html"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "index.html";
-  a.click();
+  const blob=new Blob([html],{type:"text/html"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="index.html"; a.click();
 }
-</script>
-
 
 function downloadImage(){
   if(!imageFile)return alert("Kein Bild ausgewählt");
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(imageFile);
-  a.download=imageFile.name;
-  a.click();
+  a.href=URL.createObjectURL(imageFile); a.download=imageFile.name; a.click();
 }
 </script>
 
