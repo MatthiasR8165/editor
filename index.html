@@ -96,8 +96,8 @@ pre{
 <div class="lock-wrapper" id="lockWrapper">
   <div class="lock">
     <h2>🔐 PET-ID Editor</h2>
-    <input id="pin" placeholder="PIN">
-    <button onclick="unlock()">Entsperren</button>
+    <input id="pin" placeholder="PIN" onkeydown="if(event.key==='Enter'){unlock()}">
+    <button type="button" onclick="unlock()">Entsperren</button>
   </div>
 </div>
 
