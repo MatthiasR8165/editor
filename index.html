@@ -2,11 +2,12 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<title>PET-ID Editor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PET-ID Editor – FINAL</title>
 
+<meta http-equiv="Cache-Control" content="no-store">
 <meta name="theme-color" content="#d8b48a">
-  
+
 <!-- 🐾 Icons -->
 <link rel="shortcut icon" href="/assets/icons/favicon.ico?v=editor">
 <link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico?v=editor">
@@ -21,8 +22,8 @@
   --accent:#d8b48a;
   --text:#2b2b2b;
   --muted:#777;
+  --danger:#e57373;
 }
-
 *{box-sizing:border-box}
 body{
   margin:0;
@@ -31,26 +32,59 @@ body{
   color:var(--text);
 }
 
-.wrapper{max-width:1200px;margin:auto;padding:24px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+/* 🔐 LOCK */
+.lock-wrapper{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+.lock{
+  background:var(--card);
+  max-width:420px;
+  width:100%;
+  padding:32px;
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+  text-align:center;
+}
+.lock input{
+  width:100%;
+  padding:14px;
+  font-size:16px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  margin-bottom:16px;
+}
+.lock button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:var(--accent);
+  font-weight:700;
+  cursor:pointer;
+}
+
+/* ✏️ EDITOR */
+.editor{display:none;max-width:1400px;margin:auto;padding:32px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
 
 .card{
   background:var(--card);
   border-radius:18px;
-  padding:24px;
-  box-shadow:0 6px 20px rgba(0,0,0,.06)
+  padding:28px 32px;
+  box-shadow:0 6px 20px rgba(0,0,0,.06);
 }
-
-h2{margin:0 0 16px}
+h2{margin-top:0}
 
 label{
   display:block;
-  margin:14px 0 6px;
-  font-size:14px;
   font-weight:600;
+  margin-top:16px;
 }
-
 input,textarea{
   width:100%;
   padding:12px 14px;
@@ -58,56 +92,55 @@ input,textarea{
   border:1px solid #ccc;
   font-size:15px;
 }
+textarea{min-height:70px}
 
-textarea{resize:vertical;min-height:70px}
-input[type=file]{padding:10px}
-
-button{
+.actions{grid-column:1/-1}
+.actions button{
   width:100%;
-  margin-top:12px;
   padding:16px;
   border:none;
   border-radius:14px;
-  background:#4caf50;
-  color:#fff;
   font-size:16px;
-  font-weight:600;
+  font-weight:700;
+  margin-top:12px;
   cursor:pointer;
 }
+.primary{background:var(--accent)}
+.secondary{background:#4caf50;color:#fff}
 
-.error{
-  background:#ffe5e5;
-  color:#a40000;
-  padding:12px;
-  border-radius:12px;
-  margin-bottom:12px;
-  display:none;
-}
+/* ---------- */
 </style>
 </head>
 
 <body>
 
-<div class="wrapper">
+<!-- 🔐 LOCK -->
+<div class="lock-wrapper" id="lockWrapper">
+  <div class="lock">
+    <h2>🔐 PET-ID Editor</h2>
+    <input id="pin" placeholder="PIN eingeben">
+    <button onclick="unlock()">Entsperren</button>
+  </div>
+</div>
 
-<div class="error" id="errorBox"></div>
-
+<!-- ✏️ EDITOR -->
+<div class="editor" id="editor">
 <div class="grid">
 
 <!-- META -->
 <div class="card">
 <h2>Meta</h2>
-<label>Name *</label><input id="name">
-<label>PET-ID *</label><input id="pet_id">
+<label>Name *</label><input id="name" required>
+<label>PET-ID *</label><input id="pet_id" required>
 <label>Untertitel</label><input id="subtitle">
-<label>Bild</label><input type="file" id="image">
+<label>Bild *</label><input type="file" id="image" accept="image/*" required>
 </div>
 
 <!-- TIER -->
 <div class="card">
 <h2>Tier</h2>
-<label>Tierart *</label><input id="species">
-<label>Geschlecht *</label><input id="gender">
+<label>Tierart</label><input id="species">
+<label>Geschlecht</label><input id="gender">
 <label>Geburtsdatum</label><input id="birthdate">
 <label>Farbe</label><input id="color">
 <label>Rasse</label><input id="breed">
@@ -160,85 +193,129 @@ button{
 </div>
 
 <!-- EXPORT -->
-<div class="card" style="grid-column:1/-1">
-<button onclick="generate()">index.html erzeugen</button>
+<div class="card actions">
+<h2>Export</h2>
+<button class="primary" onclick="downloadHTML()">⬇️ index.html generieren</button>
+<button class="secondary" onclick="downloadImage()">⬇️ Bild herunterladen</button>
 </div>
 
 </div>
 </div>
 
 <script>
-let imageFile=null;
-image.onchange=e=>imageFile=e.target.files[0];
+const EDITOR_PIN = "4711";
+let imageFile = null;
 
-function generate(){
-  const err=[];
-  if(!name.value.trim()) err.push("Name fehlt");
-  if(!pet_id.value.trim()) err.push("PET-ID fehlt");
-  if(!species.value.trim()) err.push("Tierart fehlt");
-  if(!gender.value.trim()) err.push("Geschlecht fehlt");
+function unlock(){
+  if(pin.value === EDITOR_PIN){
+    lockWrapper.style.display="none";
+    editor.style.display="block";
+  } else alert("Falscher PIN");
+}
 
-  if(err.length){
-    errorBox.innerHTML="❗ Bitte ausfüllen:<br>"+err.join("<br>");
-    errorBox.style.display="block";
+image.onchange = e => imageFile = e.target.files[0];
+
+function val(id){ return document.getElementById(id).value.trim(); }
+function row(label,value){
+  if(!value) return "";
+  return `<div class="row"><div>${label}</div><div><b>${value}</b></div></div>`;
+}
+
+function downloadHTML(){
+  if(!val("name") || !val("pet_id") || !imageFile){
+    alert("Name, PET-ID und Bild sind Pflichtfelder.");
     return;
   }
 
-  errorBox.style.display="none";
-
-  const v = x => x && x.trim() !== "" ? x : null;
-  const row = (l,v)=>v?`<div class="row"><div>${l}</div><div><b>${v}</b></div></div>`:"";
-
-  const html=`<!DOCTYPE html>
-<html lang="de"><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${name.value} – PET-ID</title>
+  const html = `<!DOCTYPE html><html lang="de"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${val("name")} – PET-ID</title>
 <style>
 body{font-family:system-ui;background:#f6f6f6;margin:0}
 .container{max-width:520px;margin:auto;padding:16px}
-.card{background:#fff;border-radius:18px;padding:20px;margin-bottom:16px}
-.header{text-align:center}
-.header img{width:200px;height:200px;border-radius:50%;border:6px solid #d8b48a;object-fit:cover}
+.card{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px}
 .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee}
 .footer{text-align:center;color:#777;font-size:14px}
+img{width:200px;height:200px;border-radius:50%;border:5px solid #d8b48a;object-fit:cover}
+button{width:100%;padding:14px;border:none;border-radius:12px;margin-top:10px;font-weight:600}
+.call{background:#d8b48a}
+.emergency{background:#e57373;color:#fff}
 </style></head>
 <body><div class="container">
 
-<div class="card header">
-${imageFile?`<img src="${imageFile.name}">`:""}
-<h2>${name.value}</h2>
-<div>PET-ID: ${pet_id.value}</div>
-${v(subtitle.value)?`<div>${subtitle.value}</div>`:""}
+<div class="card" style="text-align:center">
+<img src="${imageFile.name}">
+<h2>${val("name")}</h2>
+<div style="color:#d8b48a;font-family:monospace">PET-ID: ${val("pet_id")}</div>
+<div>${val("subtitle")}</div>
 </div>
 
 <div class="card">
-${row("Tierart",species.value)}
-${row("Geschlecht",gender.value)}
-${row("Geburtsdatum",birthdate.value)}
-${row("Farbe",color.value)}
-${row("Rasse",breed.value)}
-${row("Kastriert",castrated.value)}
-${row("Freigänger",outdoor.value)}
-${row("Gechippt",chipped.value)}
-${row("Geimpft",vaccinated.value)}
-${row("Mikrochip",microchip.value)}
-${row("Hinweis",note.value)}
+<h3>Das bin ich</h3>
+${row("Geburtsdatum",val("birthdate"))}
+${row("Geschlecht",val("gender"))}
+${row("Farbe",val("color"))}
+${row("Rasse",val("breed"))}
+${row("Kastriert",val("castrated"))}
+${row("Freigänger",val("outdoor"))}
+${row("Gechippt",val("chipped"))}
+${row("Geimpft",val("vaccinated"))}
+${row("Mikrochip",val("microchip"))}
+${row("Hinweis",val("note"))}
+</div>
+
+<div class="card">
+<h3>Meine Besitzer</h3>
+${row("Name",val("o1_name"))}
+${row("Telefon",val("o1_phone"))}
+${row("E-Mail",val("o1_email"))}
+${row("Name (2)",val("o2_name"))}
+${row("Telefon (2)",val("o2_phone"))}
+${row("E-Mail (2)",val("o2_email"))}
+</div>
+
+<div class="card">
+<h3>Meine Tierärztin</h3>
+${row("Praxis",val("vet_practice"))}
+${row("Arzt",val("vet_doctor"))}
+${row("Telefon",val("vet_phone"))}
+${row("E-Mail",val("vet_email"))}
+${row("Website",val("vet_website"))}
+</div>
+
+<div class="card">
+<h3>Ärztlicher Notfall</h3>
+${row("Klinik",val("em_clinic"))}
+${row("Adresse",val("em_address"))}
+${row("Telefon",val("em_phone"))}
+${row("Hinweis",val("em_note"))}
+</div>
+
+<div class="card">
+<h3>Hier wohne ich</h3>
+${row("Adresse",val("home"))}
 </div>
 
 <div class="footer">
 <a href="https://www.pet-id.page/impressum.html">Impressum</a> ·
 <a href="https://www.pet-id.page/datenschutz.html">Datenschutz</a><br>
-Zuletzt aktualisiert: ${new Date().toLocaleDateString("de-CH")}<br>
 ❤️ Danke fürs Nachschauen
 </div>
 
 </div></body></html>`;
 
-  const blob=new Blob([html],{type:"text/html"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="index.html";
+  const blob = new Blob([html],{type:"text/html"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "index.html";
+  a.click();
+}
+
+function downloadImage(){
+  if(!imageFile){ alert("Kein Bild gewählt"); return; }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(imageFile);
+  a.download = imageFile.name;
   a.click();
 }
 </script>
