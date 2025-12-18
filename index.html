@@ -218,18 +218,17 @@ function row(label,value){
   if(!value) return "";
   return `<div class="row"><div>${label}</div><div><b>${value}</b></div></div>`;
 }
-
-function btnCall(num,text){
-  if(!num) return "";
-  return `<a href="tel:${num}" class="btn call">📞 ${text}</a>`;
+function btnCall(label, number, cls="call"){
+  if(!number) return "";
+  return `<a href="tel:${number}" class="btn ${cls}">📞 ${label}</a>`;
 }
-function btnMail(mail,text){
+function btnMail(label, mail){
   if(!mail) return "";
-  return `<a href="mailto:${mail}" class="btn mail">✉️ ${text}</a>`;
+  return `<a href="mailto:${mail}" class="btn mail">✉️ ${label}</a>`;
 }
 function btnWeb(url){
   if(!url) return "";
-  return `<a href="${url}" target="_blank" class="btn web">🌐 Website öffnen</a>`;
+  return `<a href="${url}" target="_blank" class="btn web">🌍 Website öffnen</a>`;
 }
 
 function downloadHTML(){
@@ -238,25 +237,47 @@ function downloadHTML(){
     return;
   }
 
-  const html = `<!DOCTYPE html><html lang="de"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+const html = `<!DOCTYPE html><html lang="de"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${val("name")} – PET-ID</title>
+
 <style>
-body{font-family:system-ui;background:#f6f6f6;margin:0}
+body{margin:0;font-family:system-ui;background:#f6f6f6}
 .container{max-width:520px;margin:auto;padding:16px}
-.card{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px}
+.card{background:#fff;border-radius:18px;padding:20px;margin-bottom:16px}
 .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee}
-.footer{text-align:center;color:#777;font-size:14px}
 img{width:200px;height:200px;border-radius:50%;border:5px solid #d8b48a;object-fit:cover}
-.petid{font-family:monospace;font-weight:700;font-size:1.05rem;color:#d8b48a;margin-top:6px}
-.btn{display:block;width:100%;padding:14px;border-radius:12px;text-align:center;
-     font-weight:600;margin-top:10px;text-decoration:none}
+
+.petid{
+  font-size:18px;
+  font-weight:700;
+  color:#d8b48a;
+  margin-top:4px;
+}
+
+.btn{
+  display:block;
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  text-align:center;
+  font-weight:700;
+  margin-top:10px;
+  text-decoration:none;
+}
 .call{background:#d8b48a;color:#000}
-.mail,.web{background:#eee;color:#000}
+.mail{background:#eee;color:#000}
+.web{background:#eee;color:#000}
 .emergency{background:#e57373;color:#fff}
-</style></head>
+
+.footer{text-align:center;font-size:14px;color:#777;margin-top:24px}
+</style>
+</head>
+
 <body><div class="container">
 
+<!-- HEADER -->
 <div class="card" style="text-align:center">
 <img src="${imageFile.name}">
 <h2>${val("name")}</h2>
@@ -264,25 +285,56 @@ img{width:200px;height:200px;border-radius:50%;border:5px solid #d8b48a;object-f
 <div>${val("subtitle")}</div>
 </div>
 
+<!-- TIER -->
+<div class="card">
+<h3>Das bin ich</h3>
+${row("Geburtsdatum",val("birthdate"))}
+${row("Geschlecht",val("gender"))}
+${row("Farbe",val("color"))}
+${row("Rasse",val("breed"))}
+${row("Kastriert",val("castrated"))}
+${row("Freigänger",val("outdoor"))}
+${row("Gechippt",val("chipped"))}
+${row("Geimpft",val("vaccinated"))}
+${row("Mikrochip",val("microchip"))}
+${row("Hinweis",val("note"))}
+</div>
+
+<!-- BESITZER -->
 <div class="card">
 <h3>Meine Besitzer</h3>
 ${row("Name",val("o1_name"))}
-${btnCall(val("o1_phone"),"Anrufen")}
-${btnMail(val("o1_email"),"E-Mail senden")}
+${btnCall("Anrufen",val("o1_phone"))}
+${btnMail("E-Mail senden",val("o1_email"))}
+
+${row("Name (2)",val("o2_name"))}
+${btnCall("Anrufen",val("o2_phone"))}
+${btnMail("E-Mail senden",val("o2_email"))}
 </div>
 
+<!-- TIERARZT -->
 <div class="card">
 <h3>Meine Tierärztin</h3>
 ${row("Praxis",val("vet_practice"))}
-${btnCall(val("vet_phone"),"Tierarzt anrufen")}
-${btnMail(val("vet_email"),"E-Mail senden")}
+${row("Arzt",val("vet_doctor"))}
+${btnCall("Tierarzt anrufen",val("vet_phone"))}
+${btnMail("E-Mail senden",val("vet_email"))}
 ${btnWeb(val("vet_website"))}
 </div>
 
+<!-- NOTFALL -->
 <div class="card">
-<h3>Ärztlicher Notfall</h3>
+<h3>🚨 Ärztlicher Notfall</h3>
 ${row("Klinik",val("em_clinic"))}
-<a href="tel:${val("em_phone")}" class="btn emergency">🚑 Notfall anrufen</a>
+${row("Adresse",val("em_address"))}
+${btnCall("Notfall anrufen",val("em_phone"),"emergency")}
+${row("Hinweis",val("em_note"))}
+</div>
+
+<!-- ZUHAUSE -->
+<div class="card">
+<h3>Hier wohne ich</h3>
+${row("Adresse",val("home"))}
 </div>
 
 <div class="footer">
@@ -293,18 +345,10 @@ ${row("Klinik",val("em_clinic"))}
 
 </div></body></html>`;
 
-  const blob = new Blob([html],{type:"text/html"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "index.html";
-  a.click();
-}
-
-function downloadImage(){
-  if(!imageFile){ alert("Kein Bild gewählt"); return; }
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(imageFile);
-  a.download = imageFile.name;
+  const blob=new Blob([html],{type:"text/html"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="index.html";
   a.click();
 }
 </script>
